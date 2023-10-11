@@ -24,10 +24,10 @@ export function run(input) {
     errors.push(zipError);
   }
 
-  const fullAgeError = checkFullAge(input.cart.deliveryGroups);
-  if (!!fullAgeError) {
-    errors.push(fullAgeError);
-  }
+  //const fullAgeError = checkFullAge(input.cart.deliveryGroups);
+  //if (!!fullAgeError) {
+  //  errors.push(fullAgeError);
+  //}
 
 /*   const error = {
     localizedMessage: "input: " + JSON.stringify(input),
@@ -56,7 +56,7 @@ function checkZips(groups) {
     target: "cart"
   };
 
-  if (groups[0]["deliveryAddress"] === null) {
+  if (groups[0] === undefined) {
     const message = "deliveryGroups is empty. groups: " + JSON.stringify(groups);
     console.error(message);
     return {
