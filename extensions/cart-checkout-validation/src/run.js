@@ -83,7 +83,7 @@ function checkFullAge(groups) {
   const lastName = groups[0].deliveryAddress.lastName
   const city = groups[0].deliveryAddress.city
   const zip = groups[0].deliveryAddress.zip
-  schufaTest(firstName, lastName, city, zip) ? null : error;
+  return schufaTest(firstName, lastName, city, zip) ? null : error;
 }
 
 function schufaTest(firstName, lastName, city, zip) {
