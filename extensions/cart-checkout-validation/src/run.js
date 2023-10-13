@@ -4,7 +4,7 @@
 /**
 * @typedef {import("../generated/api").RunInput} RunInput
 * @typedef {import("../generated/api").FunctionRunResult} FunctionRunResult
-* @typedef {import("../generated/api").} CartLine
+* @typedef {import("../generated/api")} CartLine
 */
 
 // The configured entrypoint for the 'purchase.validation.run' extension target
@@ -14,14 +14,19 @@
 */
 export function run(input) {
   const errors = [];
+
+  if (input.cart === null) {
+    const emptyCartError = {
+      localizedMessage: "missing cart data",
+      target: "cart"
+    };
+    errors.push(emptyCartError)
+    return { errors };
+  }
+
   const lineQuantityError = checkLineQuantities(input.cart.lines)
   if (!!lineQuantityError) {
     errors.push(lineQuantityError)
-  }
-
-  const zipError = checkZips(input.cart.deliveryGroups);  
-  if (!!zipError) {
-    errors.push(zipError);
   }
 
   //const fullAgeError = checkFullAge(input.cart.deliveryGroups);
@@ -45,30 +50,10 @@ function checkLineQuantities(cartLines) {
     localizedMessage: "It is not permitted to buy more than 50 instances of a product at once.",
     target: "cart"
   };
+  console.info("cartLines: ")
   const lineQuantityGreaterLimit = cartLines.find(line => line.quantity > 50);
 
   return !!lineQuantityGreaterLimit ? error : null;
-}
-
-function checkZips(groups) {
-  const error = {
-    localizedMessage: "This zip code is not permitted to purchase products in this shop.",
-    target: "cart"
-  };
-
-  if (groups[0] === undefined) {
-    const message = "deliveryGroups is empty. groups: " + JSON.stringify(groups);
-    console.error(message);
-    return {
-      localizedMessage: message,
-      target: "cart"
-    }
-  }
-
-  const legalZipCodes = ["07743", "07749", "07751", "07778", "07745", "07740"];
-  const permittedZipCode = groups.find(group => legalZipCodes.includes(group.deliveryAddress?.zip));
-
-  return !permittedZipCode ? null : error;
 }
 
 function checkFullAge(groups) {
@@ -77,7 +62,12 @@ function checkFullAge(groups) {
     target: "cart"
   };
 
-  // null check
+  if (groups === null) {
+    return {
+      localizedMessage: "missing groups data",
+      target: "cart"
+    };
+  }
 
   const firstName = groups[0].deliveryAddress.firstName
   const lastName = groups[0].deliveryAddress.lastName
